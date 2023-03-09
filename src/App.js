@@ -1,11 +1,15 @@
 import React from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import axios from "axios";
+
 import Header from "./components/Header";
 import Drawer from "./components/Drawer";
-
 import Home from "./pages/Home";
 import Favourites from "./pages/Favourites";
+
+const AppContext = React.createContext({});
+
+
 
 function App() {
   const [items, setItems] = React.useState([]);
@@ -13,12 +17,16 @@ function App() {
   const [favourites, setFavourites] = React.useState([]);
   const [searchValue, setSearchValue] = React.useState("");
   const [cartOpened, setCartOpened] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
     async function fetchData() {
       const cartResponse = await axios.get("https://62f172ac25d9e8a2e7cc9e15.mockapi.io/cart");
       const favouritesResponse = await axios.get("https://62f172ac25d9e8a2e7cc9e15.mockapi.io/favorites");
-      const itemsResponse = await axios.get("https://62f172ac25d9e8a2e7cc9e15.mockapi.io/items");  
+      const itemsResponse = await axios.get("https://62f172ac25d9e8a2e7cc9e15.mockapi.io/items"); 
+      
+      setIsLoading(false);
+
       setCartItems(cartResponse.data);
       setFavourites(favouritesResponse.data);
       setItems(itemsResponse.data);
@@ -87,6 +95,7 @@ function App() {
               onChangeSearchInput={onChangeSearchInput}
               onAddToFavourite={onAddToFavourite}
               onAddToCart={onAddToCart}
+              isLoading={isLoading}
             />
           }
         />
