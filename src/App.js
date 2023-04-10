@@ -7,6 +7,7 @@ import Header from "./components/Header";
 import Drawer from "./components/Drawer";
 import Home from "./pages/Home";
 import Favourites from "./pages/Favourites";
+import Orders from "./pages/Orders";
 
 function App() {
   const [items, setItems] = React.useState([]);
@@ -15,6 +16,7 @@ function App() {
   const [searchValue, setSearchValue] = React.useState("");
   const [cartOpened, setCartOpened] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+
 
   React.useEffect(() => {
     async function fetchData() {
@@ -61,11 +63,11 @@ function App() {
 
   const onAddToFavourite = async (obj) => {
     try {
-      if (favourites.find((favObj) => favObj.id === obj.id)) {
+      if (favourites.find((favObj) => Number(favObj.id) === Number(obj.id))) {
         axios.delete(
           `https://62f172ac25d9e8a2e7cc9e15.mockapi.io/favorites/${obj.id}`
         );
-        setFavourites((prev) => prev.filter((item) => item.id !== obj.id));
+        setFavourites((prev) => prev.filter((item) => Number(item.id) !== Number(obj.id)));
       } else {
         const { data } = await axios.post(
           `https://62f172ac25d9e8a2e7cc9e15.mockapi.io/favorites/`,
@@ -74,7 +76,7 @@ function App() {
         setFavourites((prev) => [...prev, data]);
       }
     } catch (error) {
-      alert("Не удалось добавить в избранные");
+      alert("Не удалось добавить в избранное");
     }
   };
 
@@ -82,8 +84,12 @@ function App() {
     setSearchValue(event.target.value);
   };
 
+  const isItemAdded = (id) => {
+    return cartItems.some((obj) => Number(obj.id) === Number(id));
+  };
+
   return (
-    <AppContext.Provider value={{items, cartItems, favourites}}>
+    <AppContext.Provider value={{ items, cartItems, favourites, isItemAdded, onAddToFavourite, setCartOpened, setCartItems }}>
       <div className="wrapper clear">
         {cartOpened && (
           <Drawer
@@ -110,13 +116,13 @@ function App() {
               />
             }
           />
-          <Route
+          <Route 
             path="/favourites"
-            element={
-              <Favourites
-                onAddToFavourite={onAddToFavourite}
-              />
-            }
+            element = {<Favourites />}
+          />
+          <Route 
+            path="/orders"
+            element = {<Orders />}
           />
         </Routes>
       </div>
